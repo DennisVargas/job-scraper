@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const $ = require('cheerio');
 // const fs = require('fs');
-const fi = require('../utils/file-interface');
+const fi = require('./utils/file-interface');
 const indeedParse = require('./indeed-parser');
 
 const url = "https://www.indeed.com/jobs?q=software+developer&l=vancouver%2C+WA&radius=100&sort=date";
