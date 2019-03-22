@@ -1,54 +1,30 @@
 const puppeteer = require('puppeteer');
 const $ = require('cheerio');
-const fs = require('fs');
+// const fs = require('fs');
 const fi = require('../utils/file-interface');
+const indeedParse = require('./indeed-parser');
 
 const url = "https://www.indeed.com/jobs?q=software+developer&l=vancouver%2C+WA&radius=100&sort=date";
 
-let jobs = [];
-let jobsTitles = [];
-let companies = [];
+var indeedJobs = [];
+// let jobsTitles = [];
+// let companies = [];
 
-const readData = (callback) => {
-    fs.readFile("./output/data.html", (err, data) =>{
-        if (err) return callback(err);
-        callback(null, data);
-    });
+const OUTPUTFILEPATH = "./output/";
+const OUTPUTFILENAME = "data.html";
+
+const afterReadData = (err, data) => {
+    if(err) throw err;
+    const html = data.toString();
+    indeedParse.parseIndeedJobs(html, indeedJobs);
+    console.log(indeedJobs);
 };
 
-readData((err, data) => {
-    if(err) throw err;
+const main = () => {
+    fi.readFromFile(OUTPUTFILEPATH+OUTPUTFILENAME, afterReadData);
+};
 
-    var html = data.toString();
-    // console.log(html);
-
-    $('.company',html).each(function (ii, element) {
-    //     console.log(index);
-
-        var job = {
-            jobTitle: "",
-            company: "",
-        };
-        if(element.children.length > 1){
-    //         // console.log(element.children);
-            element.children.forEach((el, jj) => {
-                if(el.children){
-    //                 // console.log(jj);
-    //                 // console.log(el.children[jj-1].data.toString().trim());
-                    job.company = el.children[jj-1].data.toString().trim();
-                }
-            });
-        }else{
-            job.company = element.children[0].data.toString().trim();
-        }
-
-        job.jobTitle = $('.jobtitle', html)[ii].attribs.title;
-        jobs.push(job);
-    });
-
-    console.log(jobs);
-
-});
+main();
 
 // puppeteer.launch().then(
 //     async browser => {
